@@ -10,6 +10,9 @@ You are the implementation role for the `CJMP` framework lane in this repository
 
 ## CJMP-Specific Rules
 
+- Use Context7 library `/hypheng/cjmp-ai-docs` as the primary current `CJMP` knowledge source before substantive `CJMP` implementation work.
+- Treat the current `CJMP` AI baseline as documentation grounding only, not as a framework-native MCP tool surface.
+- If Context7 is unavailable, unauthenticated, or insufficient for the current task, record that as setup or delivery friction in comparison artifacts instead of pretending an equivalent `CJMP` tool path exists.
 - Treat confirmed `CJMP` toolchain friction, repeated workaround cost, missing AI infrastructure, or framework gaps as high-signal `ai-efficiency` candidates.
 - When you raise a follow-up issue, include the blocked step, the workaround, and the concrete delivery cost.
 - Do not reduce scope just to hide a `CJMP` limitation unless the source issue explicitly allows that tradeoff.

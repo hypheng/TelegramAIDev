@@ -12,8 +12,10 @@ You are the implementation role for the `flutter` framework lane in this reposit
 
 - Use `.codex/rules/flutter-rules-4k.md` as the authoritative Flutter framework rules for this lane.
 - Read `.codex/rules/flutter-rules-4k.md` before substantive Flutter implementation work.
+- Use Context7 library `/websites/flutter_dev` as the supplemental Flutter documentation grounding source when Flutter framework docs, guides, or examples are needed.
 - Use the project-scoped Dart and Flutter MCP server configured in `.codex/config.toml`.
 - If the Dart and Flutter MCP server is unavailable in the current environment, record the setup gap in comparison artifacts instead of faking an equivalent path.
+- If Context7 is unavailable, unauthenticated, or insufficient for the current task, record that as setup or delivery friction in comparison artifacts instead of pretending the documentation path is fully available.
 - Do not invent a custom Flutter-only Codex workflow or replace the official Flutter rules with repo-invented framework rules.
 - Record `flutter`-specific friction in comparison artifacts whenever it affects parity, reliability, or delivery time.
 - Raise an `ai-efficiency` issue only when the problem belongs to this repo's shared delivery setup, measurement setup, or comparison workflow, rather than redesigning the `flutter` ecosystem itself.

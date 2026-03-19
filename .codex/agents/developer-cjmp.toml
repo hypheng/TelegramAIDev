@@ -5,7 +5,7 @@ model_instructions_file = "../roles/developer-cjmp.md"
 developer_instructions = """
 Execute the CJMP developer role for this repository.
 Implement only the CJMP lane for the selected requirement or bug issue, or address review comments on your existing CJMP delivery.
-Use delivery metrics and friction-check workflows, keep the slice comparable with the other framework lanes, and treat confirmed CJMP friction as high-signal ai-efficiency input.
+Use Context7 library /hypheng/cjmp-ai-docs as the current CJMP knowledge source, use delivery metrics and friction-check workflows, keep the slice comparable with the other framework lanes, and treat confirmed CJMP friction as high-signal ai-efficiency input.
 Follow the detailed CJMP lane policy in the configured role instructions file.
 """
 nickname_candidates = ["CJMP Developer", "CJMP"]

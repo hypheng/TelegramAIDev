@@ -10,6 +10,10 @@ You are the implementation role for the `KMP` framework lane in this repository.
 
 ## KMP-Specific Rules
 
+- Use Context7 library `/jetbrains/kotlin-multiplatform-dev-docs` as the primary Codex-accessible KMP documentation source before substantive KMP implementation work.
+- Use Context7 library `/websites/kotlinlang` as the secondary official Kotlin documentation source when language, tooling, or broader Kotlin site docs are needed.
+- Treat these Context7 libraries as documentation grounding only, not as a KMP-native MCP tool surface.
+- If Context7 is unavailable, unauthenticated, or insufficient for the current task, record that as setup or delivery friction in comparison artifacts instead of pretending an equivalent KMP tool path exists in Codex.
 - Use the repo's standard `KMP` delivery path and do not invent new `KMP`-specific AI infrastructure while shipping the slice.
 - Record `KMP`-specific friction in comparison artifacts whenever it affects parity, reliability, or delivery time.
 - Raise an `ai-efficiency` issue only when the problem belongs to this repo's shared delivery setup, measurement setup, or comparison workflow, rather than redesigning the `KMP` ecosystem itself.

@@ -23,6 +23,21 @@ This repo mirrors that as project-scoped Codex config in `.codex/config.toml` wi
 - `command = "dart"`
 - `args = ["mcp-server", "--force-roots-fallback"]`
 
+## Current Flutter Codex Knowledge Source
+
+For Codex-based `flutter` development in this repo, also use the Context7 library:
+
+- `https://context7.com/websites/flutter_dev`
+- library ID: `/websites/flutter_dev`
+
+Treat this as a supplemental Flutter documentation grounding source for:
+
+- official Flutter guides
+- framework docs and examples
+- implementation references from the Flutter documentation site
+
+This does not replace the official Flutter MCP server or the official Flutter rules. It complements them.
+
 ## What The Flutter MCP Server Provides
 
 The Dart and Flutter MCP server exposes Dart and Flutter development tool actions to AI clients. Flutter documents it as the bridge between an AI assistant and Dart/Flutter developer tools.
@@ -106,6 +121,8 @@ This repo now carries the Flutter AI-infra pieces that port cleanly to Codex:
   - `.codex/roles/developer-flutter.md`
 - vendored official Flutter rules:
   - `.codex/rules/flutter-rules-4k.md`
+- supplemental Flutter Context7 documentation source:
+  - `/websites/flutter_dev`
 
 ## Official Flutter Rules
 
@@ -128,6 +145,7 @@ If a future workflow needs a local Codex-specific adaptation, derive it from the
 
 - official Dart and Flutter MCP server
 - official Flutter rules vendored locally
+- official Flutter documentation grounding through Context7 library `/websites/flutter_dev`
 - framework-aware tooling through MCP
 - shared repo workflow for issues, implementation, acceptance, and comparison
 - lane-specific Flutter instructions in the Flutter developer subagent
@@ -151,3 +169,4 @@ If the local environment cannot start `dart mcp-server`, record that as setup fr
 - `https://docs.flutter.dev/ai/create-with-ai`
 - `https://docs.flutter.dev/ai/mcp-server`
 - `https://docs.flutter.dev/ai/ai-rules`
+- `https://context7.com/websites/flutter_dev`
