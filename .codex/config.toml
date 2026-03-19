@@ -1,0 +1,11 @@
+#:schema https://developers.openai.com/codex/config-schema.json
+
+[agents]
+max_threads = 6
+max_depth = 1
+
+[mcp_servers.dart]
+command = "dart"
+args = ["mcp-server", "--force-roots-fallback"]
+required = false
+startup_timeout_sec = 20
