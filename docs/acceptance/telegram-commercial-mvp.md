@@ -40,7 +40,7 @@ Related design: `docs/design/telegram-commercial-mvp.md`
 
 - the flow is understandable without developer knowledge
 - invalid or incomplete input is handled with clear feedback
-- successful completion routes the user into the chat list
+- successful completion routes the user into the home shell with the chat list tab active
 
 ## Acceptance Scenario 3: Session Restore Skips Login
 
@@ -56,10 +56,10 @@ Related design: `docs/design/telegram-commercial-mvp.md`
 ### Pass Criteria
 
 - the app restores the session without requiring another login
-- the user lands on chat list
+- the user lands on the home shell with the chat list tab active
 - the transition does not expose broken intermediate states
 
-## Acceptance Scenario 4: Chat List Feels Telegram-Like
+## Acceptance Scenario 4: Home Shell Feels Telegram-Like
 
 ### Preconditions
 
@@ -67,9 +67,28 @@ Related design: `docs/design/telegram-commercial-mvp.md`
 
 ### Steps
 
-1. Land on the chat list.
-2. Inspect multiple chat rows.
-3. Scroll through the list.
+1. Land on the home shell.
+2. Inspect the primary tabs.
+3. Confirm the chat list tab is the default active tab.
+
+### Pass Criteria
+
+- the home shell visibly includes `Chats`, `Contacts`, and `Settings`
+- the navigation presence feels close to a real Telegram-like app rather than a single-screen prototype
+- `Chats` is the default active destination after login and restore
+- `Contacts` and `Settings` do not need full inner functionality in the MVP, but their presence must not look broken or accidental
+
+## Acceptance Scenario 5: Chat List Feels Telegram-Like
+
+### Preconditions
+
+- user is authenticated
+- home shell is visible with the chat list tab active
+
+### Steps
+
+1. Inspect multiple chat rows.
+2. Scroll through the list.
 
 ### Pass Criteria
 
@@ -78,7 +97,7 @@ Related design: `docs/design/telegram-commercial-mvp.md`
 - loading, empty, and error states are coherent and usable
 - scrolling is stable and does not visibly degrade core usability
 
-## Acceptance Scenario 5: Opening Chat Shows A Credible Conversation
+## Acceptance Scenario 6: Opening Chat Shows A Credible Conversation
 
 ### Preconditions
 
@@ -95,7 +114,7 @@ Related design: `docs/design/telegram-commercial-mvp.md`
 - date separators and delivery-state cues are shown where relevant
 - the conversation is believable as a commercial messaging app, not a mock debug screen
 
-## Acceptance Scenario 6: Sending A Local Text Message Works
+## Acceptance Scenario 7: Sending A Local Text Message Works
 
 ### Preconditions
 
