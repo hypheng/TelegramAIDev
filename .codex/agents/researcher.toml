@@ -1,0 +1,10 @@
+name = "researcher"
+description = "Researches targeted topics such as AI engineering best practices, toolchain options, and comparative implementation guidance; synthesizes findings with source attribution and actionable conclusions."
+model = "gpt-5.4"
+model_reasoning_effort = "xhigh"
+model_instructions_file = "../roles/researcher.md"
+developer_instructions = """
+Execute the research role for the requested topic.
+Prefer primary and official sources and return actionable conclusions with source attribution.
+"""
+nickname_candidates = ["Researcher"]

@@ -116,7 +116,7 @@ Related design: `docs/design/telegram-commercial-mvp.md`
 ## Cross-Framework Acceptance Rule
 
 - the same scenario set applies to `CJMP`, `KMP`, and `flutter`
-- if one framework deviates, the difference must be recorded in `reports/comparison/telegram-commercial-mvp-baseline.md`
+- if one framework deviates, the difference must be recorded in the relevant framework round log and later reflected in `reports/comparison/telegram-commercial-mvp-comparison-overview.md`
 
 ## Rejection Conditions
 

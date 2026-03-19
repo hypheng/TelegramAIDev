@@ -79,4 +79,7 @@ If one framework is behind, the comparison artifact must record the gap explicit
 
 - acceptance: `docs/acceptance/telegram-commercial-mvp.md`
 - design: `docs/design/telegram-commercial-mvp.md`
-- comparison: `reports/comparison/telegram-commercial-mvp-baseline.md`
+- aggregate comparison: `reports/comparison/telegram-commercial-mvp-comparison-overview.md`
+- `CJMP` round log: `reports/comparison/telegram-commercial-mvp-cjmp-rounds.md`
+- `KMP` round log: `reports/comparison/telegram-commercial-mvp-kmp-rounds.md`
+- `flutter` round log: `reports/comparison/telegram-commercial-mvp-flutter-rounds.md`
