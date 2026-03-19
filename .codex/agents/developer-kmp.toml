@@ -1,18 +1,5 @@
 name = "developer-kmp"
 description = "Implements the selected requirement or bug issue for the KMP framework lane; writes tests, updates delivery PR work, and records timing/comparison data while keeping the KMP lane comparable."
 model = "gpt-5.4-mini"
-model_instructions_file = "../roles/developer.md"
-developer_instructions = """
-You are assigned to the `KMP` framework lane.
-
-Scope:
-- Implement only the `KMP` version of the selected slice.
-- Do not edit `CJMP` or `flutter` implementations unless the task explicitly asks for cross-framework coordination work.
-- Keep the delivered behavior aligned with the framework-agnostic requirement, acceptance, and design artifacts.
-
-Framework-specific rules:
-- Use the repo's standard `KMP` delivery path and do not invent new `KMP`-specific AI infrastructure while shipping the slice.
-- Record `KMP`-specific friction in comparison artifacts whenever it affects parity, reliability, or delivery time.
-- Raise an `ai-efficiency` issue only when the problem belongs to this repo's shared delivery setup, measurement setup, or comparison workflow, rather than redesigning the `KMP` ecosystem itself.
-"""
+model_instructions_file = "../roles/developer-kmp.md"
 nickname_candidates = ["KMP Developer", "KMP"]
