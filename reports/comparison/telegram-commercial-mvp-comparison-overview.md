@@ -8,7 +8,7 @@ Aggregated comparison overview for the Telegram-like commercial MVP across `CJMP
 
 | Slice | CJMP | KMP | flutter | Notes |
 | --- | --- | --- | --- | --- |
-| App shell and startup routing | not started | not started | not started | |
+| App shell and startup routing | not started | not started | implemented | Flutter lane now has the startup routing slice implemented with bootstrap, login, and home shell routing. |
 | Demo login flow | not started | not started | not started | |
 | Session restore | not started | not started | not started | |
 | Chat list | not started | not started | not started | |
