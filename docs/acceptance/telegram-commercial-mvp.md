@@ -6,6 +6,9 @@ This document defines the acceptance scenarios for the Telegram-like commercial 
 
 Related requirement: `docs/requirements/telegram-commercial-mvp.md`
 Related design: `docs/design/telegram-commercial-mvp.md`
+Related design source board: `docs/design/figma-source/index.html`
+Related shared icon assets: `docs/design/assets/icons/`
+Related shared mock data: `docs/design/assets/mock-data.json`
 
 ## Acceptance Scenario 1: First Launch Routes To Login
 
@@ -135,6 +138,7 @@ Related design: `docs/design/telegram-commercial-mvp.md`
 ## Cross-Framework Acceptance Rule
 
 - the same scenario set applies to `CJMP`, `KMP`, and `flutter`
+- acceptance should validate against the shared design resource set, not against framework-local restatements of the same UI assets or demo content
 - if one framework deviates, the difference must be recorded in the relevant framework round log and later reflected in `reports/comparison/telegram-commercial-mvp-comparison-overview.md`
 
 ## Rejection Conditions

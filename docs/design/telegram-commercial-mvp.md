@@ -9,8 +9,20 @@ Related acceptance: `docs/acceptance/telegram-commercial-mvp.md`
 
 ## Figma Status
 
-- Figma artifact: pending
-- Until the Figma file is created, this document is the source of truth for framework-agnostic design decisions.
+- Figma artifact: capture started, final file generation still pending browser-side submission
+- Figma HTML source board: `docs/design/figma-source/index.html`
+- Shared icon assets: `docs/design/assets/icons/`
+- Shared mock data: `docs/design/assets/mock-data.json`
+- Until the Figma file is fully generated, this document, the HTML source board, the shared icon assets, and the shared mock data are the source of truth for framework-agnostic design decisions.
+
+## Shared Design Resources
+
+- `docs/design/figma-source/index.html`: screen inventory and layout source board
+- `docs/design/assets/icons/`: canonical SVG icon source for all framework lanes
+- `docs/design/assets/mock-data.json`: canonical demo content and UI-state sample data for all framework lanes
+- `docs/design/assets/README.md`: usage contract for shared design assets
+
+All three framework lanes should consume these shared resources directly instead of recreating near-duplicate design assets or demo content locally.
 
 ## Product Structure
 

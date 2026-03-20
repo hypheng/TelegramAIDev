@@ -84,6 +84,9 @@ If one framework is behind, the comparison artifact must record the gap explicit
 
 - acceptance: `docs/acceptance/telegram-commercial-mvp.md`
 - design: `docs/design/telegram-commercial-mvp.md`
+- design source board: `docs/design/figma-source/index.html`
+- shared icon assets: `docs/design/assets/icons/`
+- shared mock data: `docs/design/assets/mock-data.json`
 - aggregate comparison: `reports/comparison/telegram-commercial-mvp-comparison-overview.md`
 - `CJMP` round log: `reports/comparison/telegram-commercial-mvp-cjmp-rounds.md`
 - `KMP` round log: `reports/comparison/telegram-commercial-mvp-kmp-rounds.md`
