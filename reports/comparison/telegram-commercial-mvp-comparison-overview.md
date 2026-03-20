@@ -8,7 +8,7 @@ Aggregated comparison overview for the Telegram-like commercial MVP across `CJMP
 
 | Slice | CJMP | KMP | flutter | Notes |
 | --- | --- | --- | --- | --- |
-| App shell and startup routing | not started | not started | not started | |
+| App shell and startup routing | not started | not started | implemented | Flutter startup routing and login handoff are in `apps/telegram_mvp_flutter`; later slices remain not started and the bootstrap path now has a covered fallback |
 | Demo login flow | not started | not started | not started | |
 | Session restore | not started | not started | not started | |
 | Chat list | not started | not started | not started | |

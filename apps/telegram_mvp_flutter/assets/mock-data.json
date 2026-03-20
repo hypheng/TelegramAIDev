@@ -1,0 +1,15 @@
+{
+  "bootstrap": {
+    "title": "Loading Telegram Demo…",
+    "body": "Preparing the app shell before the first-launch handoff into sign-in."
+  },
+  "login": {
+    "brandTitle": "Telegram Demo",
+    "headline": "Start with your phone number",
+    "body": "Issue #1 keeps the scope tight: show a believable first-launch sign-in entry, but leave demo verification and persistence to later slices.",
+    "phoneLabel": "Phone number",
+    "phoneHint": "+1 415 555 0199",
+    "continueLabel": "Continue",
+    "footer": "Demo verification ships in issue #2."
+  }
+}
