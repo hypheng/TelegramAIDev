@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'shared_models.dart';
@@ -11,8 +12,13 @@ abstract class SharedAssetRepository {
 }
 
 class RootBundleSharedAssetRepository implements SharedAssetRepository {
-  RootBundleSharedAssetRepository({AssetBundle? bundle})
-    : _bundle = bundle ?? rootBundle;
+  RootBundleSharedAssetRepository({
+    AssetBundle? bundle,
+    bool? forceStartupFailure,
+  }) : _bundle = bundle ?? rootBundle,
+       _forceStartupFailure =
+           forceStartupFailure ??
+           (!kReleaseMode && _forceStartupFailureFromEnvironment);
 
   static const String _assetRoot = 'assets/telegram-commercial-mvp';
   static const String _designTokensPath = '$_assetRoot/design-tokens.json';
@@ -22,8 +28,13 @@ class RootBundleSharedAssetRepository implements SharedAssetRepository {
       '$_assetRoot/resource-manifest.json';
   static const String _expectedPlaceholderDestination =
       'authenticated-placeholder';
+  static const bool _forceStartupFailureFromEnvironment = bool.fromEnvironment(
+    'TELEGRAM_DEMO_FORCE_STARTUP_FAILURE',
+    defaultValue: false,
+  );
 
   final AssetBundle _bundle;
+  final bool _forceStartupFailure;
 
   @override
   Future<BootstrapCopy?> tryLoadBootstrapCopy() async {
@@ -39,6 +50,12 @@ class RootBundleSharedAssetRepository implements SharedAssetRepository {
 
   @override
   Future<SharedStartupConfig> loadStartupConfig() async {
+    if (_forceStartupFailure) {
+      throw StateError(
+        'Startup failure forced by TELEGRAM_DEMO_FORCE_STARTUP_FAILURE.',
+      );
+    }
+
     final List<String> payloads = await Future.wait(<Future<String>>[
       _bundle.loadString(_designTokensPath),
       _bundle.loadString(_sharedCopyPath),

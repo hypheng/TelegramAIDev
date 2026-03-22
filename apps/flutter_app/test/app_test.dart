@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_app/app/telegram_demo_app.dart';
@@ -57,6 +58,30 @@ void main() {
     expect(find.text('Retry startup'), findsOneWidget);
   });
 
+  testWidgets(
+    'debug startup-failure hook can force the failure route for acceptance',
+    (WidgetTester tester) async {
+      await tester.pumpWidget(
+        TelegramDemoApp(
+          repository: RootBundleSharedAssetRepository(
+            bundle: _ThrowingAssetBundle(),
+            forceStartupFailure: true,
+          ),
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 50));
+      await tester.pump(const Duration(milliseconds: 50));
+
+      expect(
+        find.textContaining('Shared design assets failed to load'),
+        findsOneWidget,
+      );
+      expect(find.text('Retry startup'), findsOneWidget);
+    },
+  );
+
   testWidgets('authenticated placeholder stays visually scoped as a placeholder', (
     WidgetTester tester,
   ) async {
@@ -78,6 +103,18 @@ void main() {
     expect(find.text('Chats'), findsNothing);
     expect(find.text('Settings'), findsNothing);
   });
+}
+
+class _ThrowingAssetBundle extends CachingAssetBundle {
+  @override
+  Future<String> loadString(String key, {bool cache = true}) {
+    throw FlutterError('Unexpected asset request for $key');
+  }
+
+  @override
+  Future<ByteData> load(String key) {
+    throw FlutterError('Unexpected binary asset request for $key');
+  }
 }
 
 class FakeSharedAssetRepository implements SharedAssetRepository {
