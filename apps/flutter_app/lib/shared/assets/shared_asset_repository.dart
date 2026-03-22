@@ -26,8 +26,6 @@ class RootBundleSharedAssetRepository implements SharedAssetRepository {
   static const String _sharedMockDataPath = '$_assetRoot/shared-mock-data.json';
   static const String _resourceManifestPath =
       '$_assetRoot/resource-manifest.json';
-  static const String _expectedPlaceholderDestination =
-      'authenticated-placeholder';
   static const bool _forceStartupFailureFromEnvironment = bool.fromEnvironment(
     'TELEGRAM_DEMO_FORCE_STARTUP_FAILURE',
     defaultValue: false,
@@ -73,28 +71,59 @@ class RootBundleSharedAssetRepository implements SharedAssetRepository {
         jsonDecode(payloads[3]) as Map<String, dynamic>;
 
     final StartupData startupData = StartupData.fromJson(mockDataMap);
-    if (startupData.defaultAuthenticatedDestination !=
-        _expectedPlaceholderDestination) {
-      throw const FormatException(
-        'Unexpected authenticated placeholder destination.',
-      );
-    }
-
     final ResourceManifest resourceManifest = ResourceManifest.fromJson(
       resourceManifestMap,
     );
+    final HomeShellData homeShellData = HomeShellData.fromJson(mockDataMap);
+    final Object? rawConversations = _coerceMap(
+      mockDataMap['chatList'],
+      'chatList',
+    )['conversations'];
+    if (rawConversations is! List<Object?>) {
+      throw const FormatException('chatList.conversations must be a list.');
+    }
+
+    final List<ChatConversation> chatConversations = rawConversations
+        .map(
+          (Object? item) => ChatConversation.fromJson(
+            _coerceMap(item, 'chatList.conversation'),
+            assetRoot: _assetRoot,
+          ),
+        )
+        .toList();
 
     return SharedStartupConfig(
       tokens: DesignTokens.fromJson(designTokenMap),
       bootstrapCopy: BootstrapCopy.fromJson(copyMap),
       loginCopy: LoginCopy.fromJson(copyMap),
+      homeShellCopy: HomeShellCopy.fromJson(copyMap),
+      chatListCopy: ChatListCopy.fromJson(copyMap),
+      homeShellData: homeShellData,
+      chatConversations: chatConversations,
       placeholderNotice: PlaceholderCopy.fromJson(copyMap).placeholderNotice,
       appMarkAssetPath: resourceManifest.resolveAssetPath(
         resourceId: 'app-mark',
+        assetRoot: _assetRoot,
+      ),
+      avatarPlaceholderAssetPath: resourceManifest.resolveAssetPath(
+        resourceId: 'avatar-placeholder',
         assetRoot: _assetRoot,
       ),
       defaultAuthenticatedDestination:
           startupData.defaultAuthenticatedDestination,
     );
   }
+}
+
+Map<String, dynamic> _coerceMap(Object? value, String label) {
+  if (value is Map<String, dynamic>) {
+    return value;
+  }
+  if (value is Map<Object?, Object?>) {
+    return value.map(
+      (Object? key, Object? nestedValue) =>
+          MapEntry(key.toString(), nestedValue),
+    );
+  }
+  throw FormatException('Expected map at $label.');
 }
