@@ -5,16 +5,26 @@ class SharedStartupConfig {
     required this.tokens,
     required this.bootstrapCopy,
     required this.loginCopy,
+    required this.homeShellCopy,
+    required this.chatListCopy,
+    required this.homeShellData,
+    required this.chatConversations,
     required this.placeholderNotice,
     required this.appMarkAssetPath,
+    required this.avatarPlaceholderAssetPath,
     required this.defaultAuthenticatedDestination,
   });
 
   final DesignTokens tokens;
   final BootstrapCopy bootstrapCopy;
   final LoginCopy loginCopy;
+  final HomeShellCopy homeShellCopy;
+  final ChatListCopy chatListCopy;
+  final HomeShellData homeShellData;
+  final List<ChatConversation> chatConversations;
   final String placeholderNotice;
   final String? appMarkAssetPath;
+  final String? avatarPlaceholderAssetPath;
   final String defaultAuthenticatedDestination;
 }
 
@@ -109,19 +119,113 @@ class LoginCopy {
   final String invalidInputNotice;
 }
 
-class PlaceholderCopy {
-  const PlaceholderCopy({required this.placeholderNotice});
+class HomeShellCopy {
+  const HomeShellCopy({
+    required this.chatsLabel,
+    required this.contactsLabel,
+    required this.settingsLabel,
+    required this.placeholderNotice,
+  });
 
-  factory PlaceholderCopy.fromJson(Map<String, dynamic> json) {
+  factory HomeShellCopy.fromJson(Map<String, dynamic> json) {
     final Map<String, dynamic> homeShell = _readMap(
       json['homeShell'],
       'homeShell',
     );
-    return PlaceholderCopy(
+    final Map<String, dynamic> tabs = _readMap(
+      homeShell['tabs'],
+      'homeShell.tabs',
+    );
+
+    return HomeShellCopy(
+      chatsLabel: _readString(tabs['chats'], 'homeShell.tabs.chats'),
+      contactsLabel: _readString(tabs['contacts'], 'homeShell.tabs.contacts'),
+      settingsLabel: _readString(tabs['settings'], 'homeShell.tabs.settings'),
       placeholderNotice: _readString(
         homeShell['placeholderNotice'],
         'homeShell.placeholderNotice',
       ),
+    );
+  }
+
+  factory HomeShellCopy.fallback() {
+    return const HomeShellCopy(
+      chatsLabel: 'Chats',
+      contactsLabel: 'Contacts',
+      settingsLabel: 'Settings',
+      placeholderNotice:
+          'This destination is intentionally scoped as a placeholder in the current MVP slice.',
+    );
+  }
+
+  final String chatsLabel;
+  final String contactsLabel;
+  final String settingsLabel;
+  final String placeholderNotice;
+
+  String labelForTabId(String tabId) {
+    switch (tabId) {
+      case 'contacts':
+        return contactsLabel;
+      case 'settings':
+        return settingsLabel;
+      case 'chats':
+      default:
+        return chatsLabel;
+    }
+  }
+}
+
+class ChatListCopy {
+  const ChatListCopy({
+    required this.title,
+    required this.loading,
+    required this.emptyTitle,
+    required this.emptyBody,
+    required this.errorTitle,
+    required this.errorBody,
+  });
+
+  factory ChatListCopy.fromJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> chatList = _readMap(
+      json['chatList'],
+      'chatList',
+    );
+    return ChatListCopy(
+      title: _readString(chatList['title'], 'chatList.title'),
+      loading: _readString(chatList['loading'], 'chatList.loading'),
+      emptyTitle: _readString(chatList['emptyTitle'], 'chatList.emptyTitle'),
+      emptyBody: _readString(chatList['emptyBody'], 'chatList.emptyBody'),
+      errorTitle: _readString(chatList['errorTitle'], 'chatList.errorTitle'),
+      errorBody: _readString(chatList['errorBody'], 'chatList.errorBody'),
+    );
+  }
+
+  factory ChatListCopy.fallback() {
+    return const ChatListCopy(
+      title: 'Telegram',
+      loading: 'Loading conversations...',
+      emptyTitle: 'No chats yet',
+      emptyBody: 'Shared seed conversations have not been loaded.',
+      errorTitle: "Couldn't load chats",
+      errorBody: 'Check shared mock data and retry.',
+    );
+  }
+
+  final String title;
+  final String loading;
+  final String emptyTitle;
+  final String emptyBody;
+  final String errorTitle;
+  final String errorBody;
+}
+
+class PlaceholderCopy {
+  const PlaceholderCopy({required this.placeholderNotice});
+
+  factory PlaceholderCopy.fromJson(Map<String, dynamic> json) {
+    return PlaceholderCopy(
+      placeholderNotice: HomeShellCopy.fromJson(json).placeholderNotice,
     );
   }
 
@@ -149,6 +253,151 @@ class StartupData {
   }
 
   final String defaultAuthenticatedDestination;
+}
+
+class HomeShellData {
+  const HomeShellData({required this.defaultTab, required this.tabs});
+
+  factory HomeShellData.fromJson(Map<String, dynamic> json) {
+    final Map<String, dynamic> homeShell = _readMap(
+      json['homeShell'],
+      'homeShell',
+    );
+    final Object? rawTabs = homeShell['tabs'];
+    if (rawTabs is! List<Object?>) {
+      throw const FormatException('homeShell.tabs must be a list.');
+    }
+
+    return HomeShellData(
+      defaultTab: _readString(homeShell['defaultTab'], 'homeShell.defaultTab'),
+      tabs: rawTabs
+          .map(
+            (Object? item) => HomeShellTabData.fromJson(_readMap(item, 'tab')),
+          )
+          .toList(),
+    );
+  }
+
+  factory HomeShellData.fallback() {
+    return HomeShellData(
+      defaultTab: 'chats',
+      tabs: const <HomeShellTabData>[
+        HomeShellTabData(
+          id: 'chats',
+          labelKey: 'homeShell.tabs.chats',
+          iconId: 'chat-bubble',
+          implementedInSlice: 4,
+          placeholderDestination: false,
+        ),
+        HomeShellTabData(
+          id: 'contacts',
+          labelKey: 'homeShell.tabs.contacts',
+          iconId: 'contacts',
+          implementedInSlice: 4,
+          placeholderDestination: true,
+        ),
+        HomeShellTabData(
+          id: 'settings',
+          labelKey: 'homeShell.tabs.settings',
+          iconId: 'settings',
+          implementedInSlice: 4,
+          placeholderDestination: true,
+        ),
+      ],
+    );
+  }
+
+  final String defaultTab;
+  final List<HomeShellTabData> tabs;
+}
+
+class HomeShellTabData {
+  const HomeShellTabData({
+    required this.id,
+    required this.labelKey,
+    required this.iconId,
+    required this.implementedInSlice,
+    required this.placeholderDestination,
+  });
+
+  factory HomeShellTabData.fromJson(Map<String, dynamic> json) {
+    return HomeShellTabData(
+      id: _readString(json['id'], 'tab.id'),
+      labelKey: _readString(json['labelKey'], 'tab.labelKey'),
+      iconId: _readString(json['iconId'], 'tab.iconId'),
+      implementedInSlice: _readInt(
+        json['implementedInSlice'],
+        'tab.implementedInSlice',
+      ),
+      placeholderDestination:
+          _readBool(
+            json['placeholderDestination'],
+            'tab.placeholderDestination',
+          ) ??
+          false,
+    );
+  }
+
+  final String id;
+  final String labelKey;
+  final String iconId;
+  final int implementedInSlice;
+  final bool placeholderDestination;
+}
+
+class ChatConversation {
+  const ChatConversation({
+    required this.id,
+    required this.title,
+    required this.snippet,
+    required this.timestamp,
+    required this.unreadCount,
+    required this.pinned,
+    required this.muted,
+    required this.avatarAssetPath,
+    required this.avatarTintName,
+  });
+
+  factory ChatConversation.fromJson(
+    Map<String, dynamic> json, {
+    required String assetRoot,
+  }) {
+    final String avatarResource = _readString(
+      json['avatarResource'],
+      'chatList.conversations.avatarResource',
+    );
+    return ChatConversation(
+      id: _readString(json['id'], 'chatList.conversations.id'),
+      title: _readString(json['title'], 'chatList.conversations.title'),
+      snippet: _readString(json['snippet'], 'chatList.conversations.snippet'),
+      timestamp: _readString(
+        json['timestamp'],
+        'chatList.conversations.timestamp',
+      ),
+      unreadCount: _readInt(
+        json['unreadCount'],
+        'chatList.conversations.unreadCount',
+      ),
+      pinned:
+          _readBool(json['pinned'], 'chatList.conversations.pinned') ?? false,
+      muted: _readBool(json['muted'], 'chatList.conversations.muted') ?? false,
+      avatarAssetPath: '$assetRoot/resources/$avatarResource',
+      avatarTintName: _readString(
+        json['avatarTint'],
+        'chatList.conversations.avatarTint',
+      ),
+    );
+  }
+
+  final String id;
+  final String title;
+  final String snippet;
+  final String timestamp;
+  final int unreadCount;
+  final bool pinned;
+  final bool muted;
+  final String avatarAssetPath;
+  final String avatarTintName;
 }
 
 class ResourceManifest {
@@ -383,6 +632,23 @@ double _readDouble(Object? value, String label) {
     return value;
   }
   throw FormatException('Expected numeric value at $label.');
+}
+
+int _readInt(Object? value, String label) {
+  if (value is int) {
+    return value;
+  }
+  throw FormatException('Expected integer at $label.');
+}
+
+bool? _readBool(Object? value, String label) {
+  if (value == null) {
+    return null;
+  }
+  if (value is bool) {
+    return value;
+  }
+  throw FormatException('Expected bool at $label.');
 }
 
 Color _parseColor(String value) {

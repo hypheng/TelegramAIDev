@@ -3,19 +3,66 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_app/app/telegram_demo_app.dart';
-import 'package:flutter_app/features/placeholder/authenticated_placeholder_screen.dart';
+import 'package:flutter_app/features/home/chat_list_screen.dart';
 import 'package:flutter_app/shared/assets/shared_asset_repository.dart';
 import 'package:flutter_app/shared/assets/shared_models.dart';
 import 'package:flutter_app/shared/session/demo_session_store.dart';
 
 void main() {
-  SharedStartupConfig buildConfig() {
+  const String avatarAssetPath =
+      'assets/telegram-commercial-mvp/resources/avatar-placeholder.svg';
+
+  List<ChatConversation> buildConversations() {
+    return const <ChatConversation>[
+      ChatConversation(
+        id: 'chat-alex',
+        title: 'Alex Mason',
+        snippet: "Let's keep the startup slice tight for all three frameworks.",
+        timestamp: '09:41',
+        unreadCount: 2,
+        pinned: true,
+        muted: false,
+        avatarAssetPath: avatarAssetPath,
+        avatarTintName: 'blue',
+      ),
+      ChatConversation(
+        id: 'chat-design',
+        title: 'Design Sync',
+        snippet:
+            'Shared assets should prevent each framework from inventing its own look.',
+        timestamp: 'Yesterday',
+        unreadCount: 0,
+        pinned: false,
+        muted: true,
+        avatarAssetPath: avatarAssetPath,
+        avatarTintName: 'purple',
+      ),
+      ChatConversation(
+        id: 'chat-ops',
+        title: 'Ops Bot',
+        snippet: 'Build is green. Token and time metrics were recorded.',
+        timestamp: 'Thu',
+        unreadCount: 1,
+        pinned: false,
+        muted: false,
+        avatarAssetPath: avatarAssetPath,
+        avatarTintName: 'green',
+      ),
+    ];
+  }
+
+  SharedStartupConfig buildConfig({List<ChatConversation>? conversations}) {
     return SharedStartupConfig(
       tokens: DesignTokens.fallback(),
       bootstrapCopy: BootstrapCopy.fallback(),
       loginCopy: LoginCopy.fallback(),
+      homeShellCopy: HomeShellCopy.fallback(),
+      chatListCopy: ChatListCopy.fallback(),
+      homeShellData: HomeShellData.fallback(),
+      chatConversations: conversations ?? buildConversations(),
       placeholderNotice: PlaceholderCopy.fallback().placeholderNotice,
       appMarkAssetPath: null,
+      avatarPlaceholderAssetPath: avatarAssetPath,
       defaultAuthenticatedDestination: 'authenticated-placeholder',
     );
   }
@@ -59,41 +106,129 @@ void main() {
       find.text('Enter a valid demo phone number to continue.'),
       findsOneWidget,
     );
+    expect(find.text('Chats'), findsNothing);
+  });
+
+  testWidgets('successful demo login lands in the home shell with chats active', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      TelegramDemoApp(
+        repository: FakeSharedAssetRepository(configFactory: buildConfig),
+        sessionStore: FakeDemoSessionStore(),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pump();
+
+    await tester.enterText(find.byType(TextField), '+1 415 555 0199');
+    await tester.tap(find.text('Continue'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 450));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Chats'), findsWidgets);
+    expect(find.text('Contacts'), findsOneWidget);
+    expect(find.text('Settings'), findsOneWidget);
+    expect(find.text('Telegram'), findsOneWidget);
+    expect(find.text('Alex Mason'), findsOneWidget);
+    expect(find.text('Design Sync'), findsOneWidget);
+    expect(find.text('Ops Bot'), findsOneWidget);
     expect(
       find.text(
         'This destination is intentionally scoped as a placeholder in the current MVP slice.',
       ),
       findsNothing,
     );
+
+    await tester.drag(find.byType(ListView), const Offset(0, -160));
+    await tester.pumpAndSettle();
+    expect(find.text('Ops Bot'), findsOneWidget);
+  });
+
+  testWidgets('contacts and settings tabs stay intentional placeholders', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      TelegramDemoApp(
+        repository: FakeSharedAssetRepository(configFactory: buildConfig),
+        sessionStore: FakeDemoSessionStore(
+          initialSession: const DemoSessionRecord(phoneNumber: '+14155550199'),
+        ),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('Contacts'));
+    await tester.pumpAndSettle();
+    expect(find.text('Contacts'), findsWidgets);
+    expect(
+      find.text(
+        'This destination is intentionally scoped as a placeholder in the current MVP slice.',
+      ),
+      findsOneWidget,
+    );
+
+    await tester.tap(find.text('Settings'));
+    await tester.pumpAndSettle();
+    expect(find.text('Settings'), findsWidgets);
+    expect(
+      find.text(
+        'This destination is intentionally scoped as a placeholder in the current MVP slice.',
+      ),
+      findsOneWidget,
+    );
   });
 
   testWidgets(
-    'successful demo login hands off into the authenticated placeholder',
+    'valid local demo session restores directly into the home shell',
     (WidgetTester tester) async {
       await tester.pumpWidget(
         TelegramDemoApp(
           repository: FakeSharedAssetRepository(configFactory: buildConfig),
-          sessionStore: FakeDemoSessionStore(),
+          sessionStore: FakeDemoSessionStore(
+            initialSession: const DemoSessionRecord(
+              phoneNumber: '+14155550199',
+            ),
+          ),
         ),
       );
 
       await tester.pump();
       await tester.pump();
-
-      await tester.enterText(find.byType(TextField), '+1 415 555 0199');
-      await tester.tap(find.text('Continue'));
-      await tester.pump();
-      await tester.pump(const Duration(milliseconds: 450));
       await tester.pumpAndSettle();
 
-      expect(
-        find.text(
-          'This destination is intentionally scoped as a placeholder in the current MVP slice.',
-        ),
-        findsOneWidget,
+      expect(find.text('Telegram'), findsOneWidget);
+      expect(find.text('Alex Mason'), findsOneWidget);
+      expect(find.text('Start with your phone number'), findsNothing);
+    },
+  );
+
+  testWidgets(
+    'invalid local demo session falls back to login and clears stored state',
+    (WidgetTester tester) async {
+      final FakeDemoSessionStore sessionStore = FakeDemoSessionStore(
+        initialSession: const DemoSessionRecord(phoneNumber: '4155550199'),
       );
-      expect(find.text('Chats'), findsNothing);
-      expect(find.text('Settings'), findsNothing);
+
+      await tester.pumpWidget(
+        TelegramDemoApp(
+          repository: FakeSharedAssetRepository(configFactory: buildConfig),
+          sessionStore: sessionStore,
+        ),
+      );
+
+      await tester.pump();
+      await tester.pump();
+      await tester.pumpAndSettle();
+
+      expect(find.text('Start with your phone number'), findsOneWidget);
+      expect(find.text('Alex Mason'), findsNothing);
+      expect(sessionStore.session, isNull);
+      expect(sessionStore.clearCount, 1);
     },
   );
 
@@ -144,86 +279,88 @@ void main() {
     },
   );
 
-  testWidgets('authenticated placeholder stays visually scoped as a placeholder', (
+  testWidgets('chat list loading state renders shared loading copy', (
     WidgetTester tester,
   ) async {
     await tester.pumpWidget(
       const MaterialApp(
-        home: AuthenticatedPlaceholderScreen(
-          placeholderNotice:
-              'This destination is intentionally scoped as a placeholder in the current MVP slice.',
-        ),
-      ),
-    );
-
-    expect(
-      find.text(
-        'This destination is intentionally scoped as a placeholder in the current MVP slice.',
-      ),
-      findsOneWidget,
-    );
-    expect(find.text('Chats'), findsNothing);
-    expect(find.text('Settings'), findsNothing);
-  });
-
-  testWidgets(
-    'valid local demo session restores directly into the authenticated placeholder',
-    (WidgetTester tester) async {
-      await tester.pumpWidget(
-        TelegramDemoApp(
-          repository: FakeSharedAssetRepository(configFactory: buildConfig),
-          sessionStore: FakeDemoSessionStore(
-            initialSession: const DemoSessionRecord(
-              phoneNumber: '+14155550199',
+        home: Scaffold(
+          body: ChatListScreen(
+            copy: ChatListCopy(
+              title: 'Telegram',
+              loading: 'Loading conversations...',
+              emptyTitle: 'No chats yet',
+              emptyBody: 'Shared seed conversations have not been loaded.',
+              errorTitle: "Couldn't load chats",
+              errorBody: 'Check shared mock data and retry.',
             ),
+            conversations: <ChatConversation>[],
+            avatarPlaceholderAssetPath: avatarAssetPath,
+            state: ChatListViewState.loading,
           ),
         ),
-      );
+      ),
+    );
 
-      await tester.pump();
-      await tester.pump();
-      await tester.pumpAndSettle();
+    expect(find.text('Loading conversations...'), findsOneWidget);
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
+  });
 
-      expect(
-        find.text(
-          'This destination is intentionally scoped as a placeholder in the current MVP slice.',
+  testWidgets('chat list empty and error states stay intentional', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: DefaultTabController(
+          length: 1,
+          child: Column(
+            children: const <Widget>[
+              Expanded(
+                child: ChatListScreen(
+                  copy: ChatListCopy(
+                    title: 'Telegram',
+                    loading: 'Loading conversations...',
+                    emptyTitle: 'No chats yet',
+                    emptyBody:
+                        'Shared seed conversations have not been loaded.',
+                    errorTitle: "Couldn't load chats",
+                    errorBody: 'Check shared mock data and retry.',
+                  ),
+                  conversations: <ChatConversation>[],
+                  avatarPlaceholderAssetPath: avatarAssetPath,
+                  state: ChatListViewState.empty,
+                ),
+              ),
+            ],
+          ),
         ),
-        findsOneWidget,
-      );
-      expect(find.text('Start with your phone number'), findsNothing);
-      expect(find.text('Chats'), findsNothing);
-    },
-  );
+      ),
+    );
 
-  testWidgets(
-    'invalid local demo session falls back to login and clears stored state',
-    (WidgetTester tester) async {
-      final FakeDemoSessionStore sessionStore = FakeDemoSessionStore(
-        initialSession: const DemoSessionRecord(phoneNumber: '4155550199'),
-      );
+    expect(find.text('No chats yet'), findsOneWidget);
+    expect(
+      find.text('Shared seed conversations have not been loaded.'),
+      findsOneWidget,
+    );
 
-      await tester.pumpWidget(
-        TelegramDemoApp(
-          repository: FakeSharedAssetRepository(configFactory: buildConfig),
-          sessionStore: sessionStore,
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: ChatListScreen(
+            copy: ChatListCopy.fallback(),
+            conversations: const <ChatConversation>[],
+            avatarPlaceholderAssetPath: avatarAssetPath,
+            state: ChatListViewState.error,
+            onRetry: () {},
+          ),
         ),
-      );
+      ),
+    );
 
-      await tester.pump();
-      await tester.pump();
-      await tester.pumpAndSettle();
-
-      expect(find.text('Start with your phone number'), findsOneWidget);
-      expect(
-        find.text(
-          'This destination is intentionally scoped as a placeholder in the current MVP slice.',
-        ),
-        findsNothing,
-      );
-      expect(sessionStore.session, isNull);
-      expect(sessionStore.clearCount, 1);
-    },
-  );
+    expect(find.text("Couldn't load chats"), findsOneWidget);
+    expect(find.text('Check shared mock data and retry.'), findsOneWidget);
+    expect(find.text('Retry'), findsOneWidget);
+  });
 }
 
 class _ThrowingAssetBundle extends CachingAssetBundle {

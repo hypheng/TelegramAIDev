@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../features/home/chat_list_screen.dart';
+import '../features/home/home_shell_screen.dart';
+import '../features/home/home_tab_placeholder_screen.dart';
 import '../features/login/login_handoff_screen.dart';
-import '../features/placeholder/authenticated_placeholder_screen.dart';
 import '../features/startup/startup_gate_screen.dart';
 import '../shared/assets/shared_asset_repository.dart';
 import '../shared/assets/shared_models.dart';
@@ -26,8 +28,9 @@ class TelegramDemoApp extends StatefulWidget {
 class _TelegramDemoAppState extends State<TelegramDemoApp> {
   static const String startupPath = '/';
   static const String loginPath = '/login';
-  static const String authenticatedPlaceholderPath =
-      '/authenticated-placeholder';
+  static const String chatsPath = '/home/chats';
+  static const String contactsPath = '/home/contacts';
+  static const String settingsPath = '/home/settings';
 
   late final AppBootstrapController _controller;
   late final GoRouter _router;
@@ -78,15 +81,74 @@ class _TelegramDemoAppState extends State<TelegramDemoApp> {
             );
           },
         ),
-        GoRoute(
-          path: authenticatedPlaceholderPath,
-          builder: (BuildContext context, GoRouterState state) {
-            return AuthenticatedPlaceholderScreen(
-              placeholderNotice:
-                  _controller.startupConfig?.placeholderNotice ??
-                  PlaceholderCopy.fallback().placeholderNotice,
+        ShellRoute(
+          builder: (BuildContext context, GoRouterState state, Widget child) {
+            return AnimatedBuilder(
+              animation: _controller,
+              builder: (BuildContext context, Widget? nestedChild) {
+                final SharedStartupConfig config =
+                    _controller.startupConfig ?? _fallbackConfig();
+                return HomeShellScreen(
+                  tabs: config.homeShellData.tabs,
+                  homeShellCopy: config.homeShellCopy,
+                  currentTabId: _tabIdForLocation(
+                    state.matchedLocation,
+                    config.homeShellData.defaultTab,
+                  ),
+                  chatListTitle: config.chatListCopy.title,
+                  onSelectTab: (String tabId) => context.go(_pathForTab(tabId)),
+                  child: child,
+                );
+              },
             );
           },
+          routes: <RouteBase>[
+            GoRoute(
+              path: chatsPath,
+              builder: (BuildContext context, GoRouterState state) {
+                return AnimatedBuilder(
+                  animation: _controller,
+                  builder: (BuildContext context, Widget? child) {
+                    final SharedStartupConfig config =
+                        _controller.startupConfig ?? _fallbackConfig();
+                    final ChatListViewState listState =
+                        config.chatConversations.isEmpty
+                        ? ChatListViewState.empty
+                        : ChatListViewState.populated;
+                    return ChatListScreen(
+                      copy: config.chatListCopy,
+                      conversations: config.chatConversations,
+                      avatarPlaceholderAssetPath:
+                          config.avatarPlaceholderAssetPath,
+                      state: listState,
+                    );
+                  },
+                );
+              },
+            ),
+            GoRoute(
+              path: contactsPath,
+              builder: (BuildContext context, GoRouterState state) {
+                final SharedStartupConfig config =
+                    _controller.startupConfig ?? _fallbackConfig();
+                return HomeTabPlaceholderScreen(
+                  title: config.homeShellCopy.contactsLabel,
+                  notice: config.placeholderNotice,
+                );
+              },
+            ),
+            GoRoute(
+              path: settingsPath,
+              builder: (BuildContext context, GoRouterState state) {
+                final SharedStartupConfig config =
+                    _controller.startupConfig ?? _fallbackConfig();
+                return HomeTabPlaceholderScreen(
+                  title: config.homeShellCopy.settingsLabel,
+                  notice: config.placeholderNotice,
+                );
+              },
+            ),
+          ],
         ),
       ],
     );
@@ -103,15 +165,69 @@ class _TelegramDemoAppState extends State<TelegramDemoApp> {
         return startupPath;
       case BootstrapPhase.noSession:
         if (_controller.isAuthenticated) {
-          if (location == authenticatedPlaceholderPath) {
+          if (_isHomeLocation(location)) {
             return null;
           }
-          return authenticatedPlaceholderPath;
+          return _defaultHomePath;
         }
         if (location == loginPath) {
           return null;
         }
         return loginPath;
+    }
+  }
+
+  String get _defaultHomePath {
+    return _pathForTab(
+      _controller.startupConfig?.homeShellData.defaultTab ??
+          HomeShellData.fallback().defaultTab,
+    );
+  }
+
+  SharedStartupConfig _fallbackConfig() {
+    return SharedStartupConfig(
+      tokens: DesignTokens.fallback(),
+      bootstrapCopy: BootstrapCopy.fallback(),
+      loginCopy: LoginCopy.fallback(),
+      homeShellCopy: HomeShellCopy.fallback(),
+      chatListCopy: ChatListCopy.fallback(),
+      homeShellData: HomeShellData.fallback(),
+      chatConversations: const <ChatConversation>[],
+      placeholderNotice: PlaceholderCopy.fallback().placeholderNotice,
+      appMarkAssetPath: null,
+      avatarPlaceholderAssetPath: null,
+      defaultAuthenticatedDestination: 'authenticated-placeholder',
+    );
+  }
+
+  String _tabIdForLocation(String location, String fallbackTabId) {
+    if (location == contactsPath) {
+      return 'contacts';
+    }
+    if (location == settingsPath) {
+      return 'settings';
+    }
+    if (location == chatsPath) {
+      return 'chats';
+    }
+    return fallbackTabId;
+  }
+
+  bool _isHomeLocation(String location) {
+    return location == chatsPath ||
+        location == contactsPath ||
+        location == settingsPath;
+  }
+
+  String _pathForTab(String tabId) {
+    switch (tabId) {
+      case 'contacts':
+        return contactsPath;
+      case 'settings':
+        return settingsPath;
+      case 'chats':
+      default:
+        return chatsPath;
     }
   }
 

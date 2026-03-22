@@ -151,3 +151,15 @@ Each round entry should include:
 - bug issue references created or updated in the round: none
 - acceptance gap, parity impact, or notable workaround: the slice now satisfies the required session-restore behavior while intentionally keeping the authenticated destination on the placeholder surface from slice `#2`; no later-slice home shell or chat list behavior was pulled forward
 - AI-efficiency friction summary: no confirmed AI-efficiency friction in this round
+
+## 2026-03-22T09:28:36Z
+
+- framework lane: `flutter`
+- work item type and issue reference: `requirement`, `issue-28`
+- concise working effort summary: Implemented Flutter slice `#4` home shell and chat list on top of slices `#1` through `#3`, routing successful login and session restore into the real home shell with the `Chats` tab active, rendering the shared chat-list rows and tab metadata from the copied shared assets, and keeping `Contacts` and `Settings` as intentional placeholder tabs.
+- total duration: `9m 2s`
+- internal step duration: understanding `6m 58s`, implementation `58s`, validation `0s`, reporting `10s`
+- token consumption: `total=3309441, input=3281270, cached_input=3168640, output=28171, reasoning_output=11157`
+- validation completed in the round: `dart format lib test`, `flutter analyze`, and `flutter test` all passed in `apps/flutter_app`
+- parity impact, delivery status change, or notable workaround: Flutter slice `#4` now exposes the real home shell with visible `Chats`, `Contacts`, and `Settings` tabs, a populated shared mock chat list with unread/pinned/muted cues, and explicit loading/empty/error state coverage without pulling forward chat detail, composer, or local send behavior.
+- AI-efficiency friction summary: no confirmed AI-efficiency friction in this round
