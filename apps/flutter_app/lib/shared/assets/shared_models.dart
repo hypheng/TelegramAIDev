@@ -456,6 +456,7 @@ class ChatDetailData {
     required this.typingSubtitle,
     required this.dateLabel,
     required this.composerPlaceholder,
+    required this.localSendBehavior,
     required this.messages,
   });
 
@@ -484,6 +485,9 @@ class ChatDetailData {
         _readMap(chatDetail['composer'], 'chatDetail.composer')['placeholder'],
         'chatDetail.composer.placeholder',
       ),
+      localSendBehavior: LocalSendBehavior.fromJson(
+        _readMap(chatDetail['localSend'], 'chatDetail.localSend'),
+      ),
       messages: rawMessages
           .map(
             (Object? item) => ChatDetailMessage.fromJson(
@@ -495,12 +499,13 @@ class ChatDetailData {
   }
 
   factory ChatDetailData.fallback() {
-    return const ChatDetailData(
+    return ChatDetailData(
       placeholderConversationId: 'chat-alex',
       subtitle: 'last seen recently',
       typingSubtitle: 'typing...',
       dateLabel: 'Today',
       composerPlaceholder: 'Type a message...',
+      localSendBehavior: LocalSendBehavior.fallback(),
       messages: <ChatDetailMessage>[
         ChatDetailMessage(
           id: 'msg-1',
@@ -527,7 +532,54 @@ class ChatDetailData {
   final String typingSubtitle;
   final String dateLabel;
   final String composerPlaceholder;
+  final LocalSendBehavior localSendBehavior;
   final List<ChatDetailMessage> messages;
+}
+
+class LocalSendBehavior {
+  const LocalSendBehavior({
+    required this.initialDeliveryState,
+    required this.settledDeliveryState,
+    required this.failureDeliveryState,
+    required this.clearComposerOnSuccess,
+  });
+
+  factory LocalSendBehavior.fromJson(Map<String, dynamic> json) {
+    return LocalSendBehavior(
+      initialDeliveryState: _readString(
+        json['initialDeliveryState'],
+        'chatDetail.localSend.initialDeliveryState',
+      ),
+      settledDeliveryState: _readString(
+        json['settledDeliveryState'],
+        'chatDetail.localSend.settledDeliveryState',
+      ),
+      failureDeliveryState: _readString(
+        json['failureDeliveryState'],
+        'chatDetail.localSend.failureDeliveryState',
+      ),
+      clearComposerOnSuccess:
+          _readBool(
+            json['clearComposerOnSuccess'],
+            'chatDetail.localSend.clearComposerOnSuccess',
+          ) ??
+          true,
+    );
+  }
+
+  factory LocalSendBehavior.fallback() {
+    return const LocalSendBehavior(
+      initialDeliveryState: 'pending',
+      settledDeliveryState: 'sent',
+      failureDeliveryState: 'failed',
+      clearComposerOnSuccess: true,
+    );
+  }
+
+  final String initialDeliveryState;
+  final String settledDeliveryState;
+  final String failureDeliveryState;
+  final bool clearComposerOnSuccess;
 }
 
 enum ChatMessageDirection { incoming, outgoing }
@@ -563,6 +615,25 @@ class ChatDetailMessage {
   final String? deliveryLabel;
 
   bool get isOutgoing => direction == ChatMessageDirection.outgoing;
+
+  ChatDetailMessage copyWith({
+    String? id,
+    ChatMessageDirection? direction,
+    String? text,
+    String? timeLabel,
+    String? deliveryLabel,
+    bool clearDeliveryLabel = false,
+  }) {
+    return ChatDetailMessage(
+      id: id ?? this.id,
+      direction: direction ?? this.direction,
+      text: text ?? this.text,
+      timeLabel: timeLabel ?? this.timeLabel,
+      deliveryLabel: clearDeliveryLabel
+          ? null
+          : (deliveryLabel ?? this.deliveryLabel),
+    );
+  }
 }
 
 class ResourceManifest {

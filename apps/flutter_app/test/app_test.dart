@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:flutter_app/app/telegram_demo_app.dart';
 import 'package:flutter_app/features/chat/chat_detail_screen.dart';
+import 'package:flutter_app/features/chat/local_chat_controller.dart';
 import 'package:flutter_app/features/home/chat_list_screen.dart';
 import 'package:flutter_app/shared/assets/shared_asset_repository.dart';
 import 'package:flutter_app/shared/assets/shared_models.dart';
@@ -105,6 +106,7 @@ void main() {
         typingSubtitle: 'typing...',
         dateLabel: 'Today',
         composerPlaceholder: 'Type a message...',
+        localSendBehavior: LocalSendBehavior.fallback(),
         messages: buildChatDetailMessages(),
       ),
       placeholderNotice: PlaceholderCopy.fallback().placeholderNotice,
@@ -255,7 +257,7 @@ void main() {
   );
 
   testWidgets(
-    'shared seed conversation opens chat detail with date separator and inactive composer',
+    'shared seed conversation opens chat detail with local send composer',
     (WidgetTester tester) async {
       await tester.pumpWidget(
         TelegramDemoApp(
@@ -288,10 +290,36 @@ void main() {
       );
       expect(find.byTooltip('Read'), findsWidgets);
       expect(find.text('Type a message...'), findsOneWidget);
-      expect(find.text('Inactive'), findsOneWidget);
-      expect(find.byType(TextField), findsNothing);
-      expect(find.byIcon(Icons.send_rounded), findsNothing);
+      expect(find.byType(TextField), findsOneWidget);
+      expect(find.byTooltip('Send'), findsOneWidget);
       expect(find.byType(NavigationBar), findsNothing);
+
+      await tester.enterText(
+        find.byKey(const ValueKey<String>('chat-composer-input')),
+        'Local demo send works.',
+      );
+      await tester.pump();
+      await tester.tap(
+        find.byKey(const ValueKey<String>('chat-composer-send')),
+      );
+      await tester.pump();
+
+      expect(find.text('Local demo send works.'), findsOneWidget);
+      expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+      await tester.pump(const Duration(milliseconds: 350));
+      await tester.pumpAndSettle();
+
+      expect(find.byIcon(Icons.done_rounded), findsOneWidget);
+      expect(
+        tester
+            .widget<TextField>(
+              find.byKey(const ValueKey<String>('chat-composer-input')),
+            )
+            .controller
+            ?.text,
+        isEmpty,
+      );
 
       await tester.drag(find.byType(ListView), const Offset(0, -120));
       await tester.pumpAndSettle();
@@ -303,6 +331,78 @@ void main() {
       );
     },
   );
+
+  testWidgets('failed local send stays recoverable and can be retried', (
+    WidgetTester tester,
+  ) async {
+    int attemptCount = 0;
+
+    Future<void> flakySend(LocalMessageDraft draft) async {
+      await Future<void>.delayed(const Duration(milliseconds: 20));
+      attemptCount += 1;
+      if (attemptCount == 1) {
+        throw StateError('local send failed');
+      }
+    }
+
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ChatDetailScreen(
+          conversation: buildConversations().first,
+          chatDetailCopy: ChatDetailCopy.fallback(),
+          chatDetailData: ChatDetailData(
+            placeholderConversationId: 'chat-alex',
+            subtitle: 'last seen recently',
+            typingSubtitle: 'typing...',
+            dateLabel: 'Today',
+            composerPlaceholder: 'Type a message...',
+            localSendBehavior: LocalSendBehavior.fallback(),
+            messages: buildChatDetailMessages(),
+          ),
+          onBack: () {},
+          sendExecutor: flakySend,
+          now: () => DateTime(2026, 3, 22, 10, 45),
+        ),
+      ),
+    );
+
+    await tester.enterText(
+      find.byKey(const ValueKey<String>('chat-composer-input')),
+      'Retry this local message',
+    );
+    await tester.pump();
+    await tester.tap(find.byKey(const ValueKey<String>('chat-composer-send')));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 30));
+
+    expect(
+      find.text('The local demo message could not be sent. Try again.'),
+      findsOneWidget,
+    );
+    expect(find.byIcon(Icons.error_outline_rounded), findsOneWidget);
+    expect(find.text('Retry this local message'), findsOneWidget);
+
+    await tester.tap(find.text('Retry'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 30));
+    await tester.pumpAndSettle();
+
+    expect(
+      find.text('The local demo message could not be sent. Try again.'),
+      findsNothing,
+    );
+    expect(find.byIcon(Icons.done_rounded), findsOneWidget);
+    expect(attemptCount, 2);
+    expect(
+      tester
+          .widget<TextField>(
+            find.byKey(const ValueKey<String>('chat-composer-input')),
+          )
+          .controller
+          ?.text,
+      isEmpty,
+    );
+  });
 
   testWidgets('chat detail back navigation returns to the chat list', (
     WidgetTester tester,
