@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_test/flutter_test.dart';
+
+import 'package:flutter_app/app/telegram_demo_app.dart';
+import 'package:flutter_app/features/placeholder/authenticated_placeholder_screen.dart';
+import 'package:flutter_app/shared/assets/shared_asset_repository.dart';
+import 'package:flutter_app/shared/assets/shared_models.dart';
+
+void main() {
+  SharedStartupConfig buildConfig() {
+    return SharedStartupConfig(
+      tokens: DesignTokens.fallback(),
+      bootstrapCopy: BootstrapCopy.fallback(),
+      loginCopy: LoginCopy.fallback(),
+      placeholderNotice: PlaceholderCopy.fallback().placeholderNotice,
+      appMarkAssetPath: null,
+      defaultAuthenticatedDestination: 'authenticated-placeholder',
+    );
+  }
+
+  testWidgets('first launch routes cleanly into the login handoff state', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      TelegramDemoApp(
+        repository: FakeSharedAssetRepository(configFactory: buildConfig),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pump();
+
+    expect(find.text('Telegram Demo'), findsOneWidget);
+    expect(find.text('Start with your phone number'), findsOneWidget);
+    expect(find.byType(TextField), findsNothing);
+    expect(find.text('Continue'), findsNothing);
+  });
+
+  testWidgets('startup failure shows an explicit notice instead of a spinner', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      TelegramDemoApp(
+        repository: FakeSharedAssetRepository(error: StateError('load failed')),
+      ),
+    );
+
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    await tester.pump(const Duration(milliseconds: 50));
+
+    expect(
+      find.textContaining('Shared design assets failed to load'),
+      findsOneWidget,
+    );
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+    expect(find.text('Retry startup'), findsOneWidget);
+  });
+
+  testWidgets('authenticated placeholder stays visually scoped as a placeholder', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(
+      const MaterialApp(
+        home: AuthenticatedPlaceholderScreen(
+          placeholderNotice:
+              'This destination is intentionally scoped as a placeholder in the current MVP slice.',
+        ),
+      ),
+    );
+
+    expect(
+      find.text(
+        'This destination is intentionally scoped as a placeholder in the current MVP slice.',
+      ),
+      findsOneWidget,
+    );
+    expect(find.text('Chats'), findsNothing);
+    expect(find.text('Settings'), findsNothing);
+  });
+}
+
+class FakeSharedAssetRepository implements SharedAssetRepository {
+  FakeSharedAssetRepository({this.configFactory, this.error});
+
+  final SharedStartupConfig Function()? configFactory;
+  final Object? error;
+
+  @override
+  Future<BootstrapCopy?> tryLoadBootstrapCopy() async {
+    return BootstrapCopy.fallback();
+  }
+
+  @override
+  Future<SharedStartupConfig> loadStartupConfig() async {
+    if (error != null) {
+      throw error!;
+    }
+
+    final SharedStartupConfig? config = configFactory?.call();
+    if (config == null) {
+      throw StateError('Missing startup config');
+    }
+    return config;
+  }
+}
