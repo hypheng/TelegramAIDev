@@ -178,3 +178,27 @@ Each round entry should include:
 - bug issue references created or updated in the round: none
 - acceptance gap, parity impact, or notable workaround: the slice now satisfies the required real home-shell handoff while intentionally leaving chat detail and composer behavior out of scope; no product bug or acceptance gap remained in this round
 - AI-efficiency friction summary: no confirmed AI-efficiency friction in this round
+
+## 2026-03-22T09:40:47Z
+
+- framework lane: `flutter`
+- work item type and issue reference: `requirement`, `issue-31`
+- concise working effort summary: Stopped before implementation because the canonical shared chat-detail mock data is insufficient for slice `#5`: the shared seed messages include `direction`, `text`, and `deliveryState`, but no date or date-label metadata to drive the required date separators without inventing Flutter-local content.
+- total duration: `blocked during understanding`
+- internal step duration: understanding `32s`
+- token consumption: `pending round close`
+- validation completed in the round: none; implementation did not proceed because the shared mock-data contract is missing separator-driving chat-detail metadata
+- parity impact, delivery status change, or notable workaround: Flutter slice `#5` is blocked on a shared asset gap rather than a Flutter implementation gap. The current shared source can support a basic conversation title and delivery-state cue rendering, but not the required date separators from canonical data.
+- AI-efficiency friction summary: no confirmed AI-efficiency friction in this round
+
+## 2026-03-22T09:50:18Z
+
+- framework lane: `flutter`
+- work item type and issue reference: `requirement`, `issue-31`
+- concise working effort summary: Promoted separator-driving chat-detail fields from the existing richer repo design data into the canonical shared mock asset, copied the updated canonical asset into the Flutter app, and implemented slice `#5` chat-detail routing, title/back navigation, shared seed conversation rendering, date separator, delivery-state cues, stable scroll behavior, and a clearly inactive composer shell without pulling local send forward.
+- total duration: `7m 20s`
+- internal step duration: understanding `2m 54s`, implementation `1m 4s`, validation `0s`, reporting `0s`
+- token consumption: `total=4224458, input=4205314, cached_input=4008832, output=19144, reasoning_output=7521`
+- validation completed in the round: `dart format lib test`, `flutter analyze`, and `flutter test` all passed in `apps/flutter_app`
+- parity impact, delivery status change, or notable workaround: Flutter slice `#5` now opens the shared seed conversation from the chat list and renders the shared canonical detail content in a standalone chat route while keeping composer interaction and local send explicitly out of scope. The canonical shared asset contract for this slice is now stronger because the separator-driving metadata lives in `shared/design/telegram-commercial-mvp/shared-mock-data.json` instead of framework-local code.
+- AI-efficiency friction summary: no confirmed AI-efficiency friction in this round
