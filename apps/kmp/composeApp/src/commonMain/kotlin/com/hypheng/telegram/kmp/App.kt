@@ -46,7 +46,9 @@ import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.launch
 
 @Composable
-fun TelegramDemoApp() {
+internal fun TelegramDemoApp(
+    startupRuntimeHook: StartupRuntimeHook = StartupRuntimeHook.None,
+) {
     var startupAssets by remember { mutableStateOf<StartupAssets?>(null) }
     val navController = rememberNavController()
     val colorScheme = startupAssets?.tokens?.toColorScheme() ?: lightColorScheme()
@@ -66,6 +68,7 @@ fun TelegramDemoApp() {
             ) {
                 composable(AppRoute.Bootstrap.route) {
                     BootstrapRoute(
+                        startupRuntimeHook = startupRuntimeHook,
                         onLoaded = { assets ->
                             startupAssets = assets
                             navController.navigate(AppRoute.Login.route) {
@@ -98,17 +101,22 @@ fun TelegramDemoApp() {
 
 @Composable
 private fun BootstrapRoute(
+    startupRuntimeHook: StartupRuntimeHook,
     onLoaded: (StartupAssets) -> Unit,
 ) {
     var bootstrapCopy by remember { mutableStateOf<BootstrapCopy?>(null) }
     var failureMessage by remember { mutableStateOf<String?>(null) }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(startupRuntimeHook) {
         failureMessage = null
-        bootstrapCopy = runCatching { StartupAssetRepository.loadBootstrapCopy() }.getOrNull()
-        runCatching { StartupAssetRepository.loadAll() }
-            .onSuccess(onLoaded)
-            .onFailure { failureMessage = it.message ?: "Startup failed" }
+        val result = loadBootstrapRouteResult(
+            startupRuntimeHook = startupRuntimeHook,
+        )
+        bootstrapCopy = result.bootstrapCopy
+        when (val outcome = result.outcome) {
+            is BootstrapLoadOutcome.Loaded -> onLoaded(outcome.assets)
+            is BootstrapLoadOutcome.Failure -> failureMessage = outcome.notice
+        }
     }
 
     when (val error = failureMessage) {
