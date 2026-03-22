@@ -74,3 +74,49 @@ Each round entry should include:
 - validation completed in the round: `cd apps/kmp && ./gradlew --no-daemon :composeApp:testDebugUnitTest :composeApp:assembleDebug` ✅
 - parity impact, delivery status change, or notable workaround: KMP slice `#1` no longer feeds invalid Compose color-space bits into `MaterialTheme` during startup, so the shared-token theme path should now stay aligned with the intended login-first startup routing instead of crashing before the unauthenticated handoff.
 - AI-efficiency friction summary: `no confirmed AI-efficiency friction in this round`
+
+## 2026-03-22T10:31:55Z — KMP requirement issue-18 re-acceptance
+
+- framework lane: `KMP`
+- work item type and issue reference: `requirement`, `issue-18`
+- scenarios validated in the round:
+  - first launch without session reaches login cleanly
+  - startup failure does not leave the app stuck on a spinner
+  - any authenticated destination reachable in this slice is clearly a placeholder, not a later-slice implementation
+- acceptance outcome: `blocked`
+- concise working effort or acceptance summary: Re-ran merged-main acceptance for KMP requirement `#18` after bug-fix PR `#44`. Confirmed `origin/main` at commit `9511ba8` includes the startup-crash fix from PR `#44`, rebuilt `apps/kmp`, cleared app state on Android emulator `Pixel_3a_API_34_Local`, and runtime-verified clean first launch into the login surface with no startup crash and no later-slice home-shell UI.
+- total duration: `5m 26s`
+- internal step duration:
+  - `acceptance-prep`: `34s`
+  - `runtime-validation`: `3m 26s`
+  - `friction-check`: `37s`
+  - `report-update`: `22s`
+- token consumption: `total=2886313, input=2874494, cached_input=2764672, output=11819, reasoning_output=5140`
+- evidence captured or missing:
+  - captured: `.cache/android-acceptance/req18-reaccept/login.png`
+  - captured: `.cache/android-acceptance/req18-reaccept/login-ui.xml`
+  - captured: `.cache/android-acceptance/req18-reaccept/post-tap.png`
+  - captured: `.cache/android-acceptance/req18-reaccept/post-tap-ui.xml`
+  - captured: `.cache/android-acceptance/req18-reaccept/logcat-tail.txt`
+  - missing: direct runtime evidence for the startup-failure branch, because the delivered KMP build still exposes no deterministic acceptance path to force `StartupFailureScreen`
+- bug issue references created or updated in the round:
+  - none
+- acceptance gap, parity impact, or notable workaround: Bug `#42` is fixed and the slice now launches cleanly to login, but full requirement-`#18` sign-off remains blocked because the required startup-failure scenario is still not runtime-triggerable on merged main. No authenticated placeholder or later-slice home shell became reachable in this rerun; the visible surface remained the intended login-only slice.
+- AI-efficiency friction summary: confirmed repo-level acceptance friction. KMP slice `#1` still lacks a runtime trigger for the required startup-failure scenario; tracked in issue `#45`
+
+## 2026-03-22T10:39:43Z — KMP bug-fix issue-45
+
+- framework lane: `KMP`
+- work item type and issue reference: `bug-fix`, `issue-45`
+- concise working effort summary: Added a debug-only Android launch-intent hook for KMP slice `#1` startup-failure acceptance, kept the default no-session launch routing unchanged, covered the normal and forced-failure bootstrap paths with unit tests, and opened PR `#46` to close issue `#45`.
+- total duration: `6m 56s`
+- internal step duration:
+  - `context-and-grounding`: `1m 36s`
+  - `implementation`: `2m 5s`
+  - `validation`: `1m 28s`
+  - `report-and-pr`: `1m 32s`
+- token consumption: `total=2273043, input=2257309, cached_input=2210944, output=15734, reasoning_output=6851`
+- validation completed in the round:
+  - `cd apps/kmp && ./gradlew --no-daemon :composeApp:testDebugUnitTest :composeApp:assembleDebug` ✅
+- parity impact, delivery status change, or notable workaround: KMP slice `#1` now exposes a deterministic non-production startup-failure path from the shipped debug APK via `adb shell am start -n com.hypheng.telegram.kmp/.MainActivity --es startup_debug_hook force_failure`, while default first launch without the extra still routes cleanly to login. This unblocks runtime verification of the required failure-state branch for requirement `#18` without adding a user-visible setting or release-only behavior.
+- AI-efficiency friction summary: `no confirmed AI-efficiency friction in this round`
