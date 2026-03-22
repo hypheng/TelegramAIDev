@@ -42,6 +42,20 @@ Each round entry should include:
 - acceptance gap, parity impact, or notable workaround: merge should remain blocked for full acceptance sign-off because one required slice scenario is not runtime-verifiable through the delivered build. Repo-level acceptance friction was recorded in issue `#16`.
 - AI-efficiency friction summary: confirmed repo-level acceptance friction. Flutter slice `#1` lacks a runtime path to trigger the required startup-failure scenario; tracked in issue `#16`
 
+## 2026-03-22T03:14:42Z
+
+- framework lane: `flutter`
+- work item type and issue reference: `requirement`, `issue-19-acceptance`
+- concise working effort or acceptance summary: Re-ran Flutter acceptance for requirement `#19` / PR `#15` on Android emulator `emulator-5554`. Runtime validation passed both required scenarios: clean no-session first launch to login without later-slice surfaces, and forced startup failure via `flutter run --dart-define=TELEGRAM_DEMO_FORCE_STARTUP_FAILURE=true` showing an explicit recoverable failure without spinner lock.
+- total duration: `4m 18s`
+- internal step duration: runtime `3m 5s`, reporting `30s`
+- token consumption: `total=3589953, input=3581555, cached_input=3423488, output=8398, reasoning_output=2620`
+- acceptance outcome: `passed`
+- evidence captured or missing: normal launch screenshot `/Users/haifengsong/code-base/telegram/worktrees/flutter-issue-1/.cache/android-acceptance/issue19-normal.png`, normal launch UI dump `/Users/haifengsong/code-base/telegram/worktrees/flutter-issue-1/.cache/android-acceptance/issue19-normal.xml`, forced failure screenshot `/Users/haifengsong/code-base/telegram/worktrees/flutter-issue-1/.cache/android-acceptance/issue19-failure-afterwait.png`, forced failure UI dump `/Users/haifengsong/code-base/telegram/worktrees/flutter-issue-1/.cache/android-acceptance/issue19-failure-afterwait.xml`, retry-state screenshot `/Users/haifengsong/code-base/telegram/worktrees/flutter-issue-1/.cache/android-acceptance/issue19-failure-retry.png`, retry-state UI dump `/Users/haifengsong/code-base/telegram/worktrees/flutter-issue-1/.cache/android-acceptance/issue19-failure-retry.xml`
+- bug issue references created or updated in the round: none
+- acceptance gap, parity impact, or notable workaround: no remaining acceptance gap for slice `#1` in this rerun. The previously reported runtime-failure-trigger friction is resolved in the current PR.
+- AI-efficiency friction summary: no confirmed AI-efficiency friction in this round
+
 ## 2026-03-22T03:11:31Z
 
 - framework lane: `flutter`
@@ -52,4 +66,19 @@ Each round entry should include:
 - token consumption: `not observable`
 - validation completed in the round: `dart format apps/flutter_app/lib/shared/assets/shared_asset_repository.dart apps/flutter_app/test/app_test.dart`, `flutter analyze`, and `flutter test` all passed in `apps/flutter_app`
 - parity impact, delivery status change, or notable workaround: Flutter slice `#1` now exposes a deterministic acceptance-safe startup-failure path in non-release builds via `--dart-define=TELEGRAM_DEMO_FORCE_STARTUP_FAILURE=true`, while the default shipped startup behavior remains unchanged.
+- AI-efficiency friction summary: no confirmed AI-efficiency friction in this round
+
+## 2026-03-22T03:19:00Z
+
+- framework lane: `flutter`
+- work item type and issue reference: `requirement`, `issue-19-acceptance`
+- concise working effort or acceptance summary: Re-ran Android emulator acceptance for Flutter requirement `#19` and fully validated both required slice scenarios: clean first launch into the login handoff and explicit startup failure with retry using the acceptance-only dart-define hook.
+- total duration: `4m 18s`
+- internal step duration: runtime `3m 5s`, reporting `30s`
+- token consumption: `total=3589953, input=3581555, cached_input=3423488, output=8398, reasoning_output=2620`
+- scenarios validated in the round: runtime-verified no-session launch into the login handoff, runtime-verified forced startup failure with explicit notice and retry control, and runtime-verified no spinner lock during the forced failure scenario
+- acceptance outcome: `accepted`
+- evidence captured or missing: captured runtime screenshots at `/Users/haifengsong/code-base/telegram/worktrees/flutter-issue-1/.cache/android-acceptance/issue19-normal.png`, `/Users/haifengsong/code-base/telegram/worktrees/flutter-issue-1/.cache/android-acceptance/issue19-failure.png`, `/Users/haifengsong/code-base/telegram/worktrees/flutter-issue-1/.cache/android-acceptance/issue19-failure-retry.png`, and `/Users/haifengsong/code-base/telegram/worktrees/flutter-issue-1/.cache/android-acceptance/issue19-failure-afterwait.png`, with supporting UI dumps beside each image
+- bug issue references created or updated in the round: none
+- acceptance gap, parity impact, or notable workaround: the deterministic non-release launch flag closed the prior runtime acceptance gap without changing the default shipped startup behavior, so PR `#15` is now clear to merge for Flutter slice `#1`
 - AI-efficiency friction summary: no confirmed AI-efficiency friction in this round
