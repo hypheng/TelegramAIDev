@@ -199,3 +199,20 @@ Each round entry should include:
   - none
 - acceptance gap, parity impact, or notable workaround: KMP slice `#2` is acceptance-verified on merged main and still routes only to the scoped authenticated placeholder from slice `#1`, preserving the no-home-shell boundary required before session restore and home-shell slices.
 - AI-efficiency friction summary: `no confirmed AI-efficiency friction in this round`
+
+## 2026-03-23T03:26:09Z — KMP requirement issue-24
+
+- framework lane: `KMP`
+- work item type and issue reference: `requirement`, `issue-24`
+- concise working effort summary: Implemented KMP slice `#3` local demo-session persistence and restore by saving a verified phone session to Android-backed local storage, resolving valid stored sessions through the bootstrap gate into the existing authenticated placeholder, and clearing invalid stored session state back to login without introducing any home-shell or chat-detail behavior.
+- total duration: `5m 20s`
+- internal step duration:
+  - `context-and-docs`: `1m 16s`
+  - `implementation`: `1m 54s`
+  - `validation`: `30s`
+  - `report-and-pr`: `1m 4s`
+  - `round-log-update`: `25s`
+- token consumption: `total=1852118, input=1838450, cached_input=1817216, output=13668, reasoning_output=7250`
+- validation completed in the round: `cd apps/kmp && ./gradlew --no-daemon :composeApp:testDebugUnitTest :composeApp:assembleDebug` ✅
+- parity impact, delivery status change, or notable workaround: KMP slice `#3` now restores directly back to the scoped authenticated placeholder after relaunch when the local demo session is valid, while invalid or unsupported stored state is cleared and routed back to login. The slice still does not expose any real home shell, chat list, chat detail, or composer behavior ahead of their later requirements.
+- AI-efficiency friction summary: `no confirmed AI-efficiency friction in this round`
