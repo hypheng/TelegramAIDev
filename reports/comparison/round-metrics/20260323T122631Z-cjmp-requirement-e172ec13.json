@@ -1,0 +1,78 @@
+{
+  "codex_session_file": "/Users/haifengsong/.codex/sessions/2026/03/23/rollout-2026-03-23T20-24-55-019d1aa7-c4f1-7183-8901-85b7d7c3374d.jsonl",
+  "codex_thread_id": "019d1aa7-c4f1-7183-8901-85b7d7c3374d",
+  "ended_at": "2026-03-23T12:47:06Z",
+  "framework_lane": "cjmp",
+  "round_id": "20260323T122631Z-cjmp-requirement-e172ec13",
+  "started_at": "2026-03-23T12:26:31Z",
+  "steps": [
+    {
+      "duration_sec": 869,
+      "ended_at": "2026-03-23T12:45:19Z",
+      "name": "implementation",
+      "started_at": "2026-03-23T12:30:50Z"
+    },
+    {
+      "duration_sec": 88,
+      "ended_at": "2026-03-23T12:46:59Z",
+      "name": "report-closeout",
+      "started_at": "2026-03-23T12:45:31Z"
+    }
+  ],
+  "token_consumption": {
+    "cached_input_tokens": 8872192,
+    "input_tokens": 9157308,
+    "output_tokens": 26656,
+    "reasoning_output_tokens": 13007,
+    "total_tokens": 9183964
+  },
+  "token_usage_delta": {
+    "cached_input_tokens": 8872192,
+    "input_tokens": 9157308,
+    "output_tokens": 26656,
+    "reasoning_output_tokens": 13007,
+    "total_tokens": 9183964
+  },
+  "token_usage_end": {
+    "last": {
+      "cached_input_tokens": 206208,
+      "input_tokens": 206434,
+      "output_tokens": 744,
+      "reasoning_output_tokens": 400,
+      "total_tokens": 207178
+    },
+    "model_context_window": 258400,
+    "timestamp": "2026-03-23T12:46:59.475Z",
+    "total": {
+      "cached_input_tokens": 8980224,
+      "input_tokens": 9305408,
+      "output_tokens": 28846,
+      "reasoning_output_tokens": 14013,
+      "total_tokens": 9334254
+    }
+  },
+  "token_usage_source": "codex-session-jsonl",
+  "token_usage_start": {
+    "last": {
+      "cached_input_tokens": 37376,
+      "input_tokens": 45673,
+      "output_tokens": 814,
+      "reasoning_output_tokens": 516,
+      "total_tokens": 46487
+    },
+    "model_context_window": 258400,
+    "timestamp": "2026-03-23T12:26:25.196Z",
+    "total": {
+      "cached_input_tokens": 108032,
+      "input_tokens": 148100,
+      "output_tokens": 2190,
+      "reasoning_output_tokens": 1006,
+      "total_tokens": 150290
+    }
+  },
+  "total_duration_sec": 1235,
+  "version": 1,
+  "work_item_ref": "issue-17",
+  "work_item_type": "requirement",
+  "working_effort_summary": "Bootstrapped the CJMP lane with a Keels app, copied the slice-1 canonical shared assets into app-local files, generated CJ source from those copied assets to keep runtime reads off the shared source tree, implemented the startup loading/login handoff/failure shell in the app entry view, and validated with keels build apk --platform android-arm64 --debug."
+}

@@ -1,0 +1,84 @@
+{
+  "codex_session_file": "/Users/haifengsong/.codex/sessions/2026/03/23/rollout-2026-03-23T20-56-21-019d1ac4-8aac-7a72-9ab7-0036d572596d.jsonl",
+  "codex_thread_id": "019d1ac4-8aac-7a72-9ab7-0036d572596d",
+  "ended_at": "2026-03-23T13:03:15Z",
+  "framework_lane": "cjmp",
+  "round_id": "20260323T125656Z-cjmp-requirement-44c9c8af",
+  "started_at": "2026-03-23T12:56:56Z",
+  "steps": [
+    {
+      "duration_sec": 56,
+      "ended_at": "2026-03-23T12:59:26Z",
+      "name": "acceptance-prep",
+      "started_at": "2026-03-23T12:58:30Z"
+    },
+    {
+      "duration_sec": 158,
+      "ended_at": "2026-03-23T13:02:04Z",
+      "name": "runtime-validation",
+      "started_at": "2026-03-23T12:59:26Z"
+    },
+    {
+      "duration_sec": 71,
+      "ended_at": "2026-03-23T13:03:15Z",
+      "name": "evidence-and-closeout",
+      "started_at": "2026-03-23T13:02:04Z"
+    }
+  ],
+  "token_consumption": {
+    "cached_input_tokens": 1283200,
+    "input_tokens": 1548850,
+    "output_tokens": 8252,
+    "reasoning_output_tokens": 2496,
+    "total_tokens": 1557102
+  },
+  "token_usage_delta": {
+    "cached_input_tokens": 1283200,
+    "input_tokens": 1548850,
+    "output_tokens": 8252,
+    "reasoning_output_tokens": 2496,
+    "total_tokens": 1557102
+  },
+  "token_usage_end": {
+    "last": {
+      "cached_input_tokens": 2432,
+      "input_tokens": 58434,
+      "output_tokens": 506,
+      "reasoning_output_tokens": 60,
+      "total_tokens": 58940
+    },
+    "model_context_window": 258400,
+    "timestamp": "2026-03-23T13:03:13.552Z",
+    "total": {
+      "cached_input_tokens": 11948160,
+      "input_tokens": 12974406,
+      "output_tokens": 42662,
+      "reasoning_output_tokens": 18508,
+      "total_tokens": 13017068
+    }
+  },
+  "token_usage_source": "codex-session-jsonl",
+  "token_usage_start": {
+    "last": {
+      "cached_input_tokens": 3456,
+      "input_tokens": 225039,
+      "output_tokens": 535,
+      "reasoning_output_tokens": 161,
+      "total_tokens": 225574
+    },
+    "model_context_window": 258400,
+    "timestamp": "2026-03-23T12:56:55.923Z",
+    "total": {
+      "cached_input_tokens": 10664960,
+      "input_tokens": 11425556,
+      "output_tokens": 34410,
+      "reasoning_output_tokens": 16012,
+      "total_tokens": 11459966
+    }
+  },
+  "total_duration_sec": 379,
+  "version": 1,
+  "work_item_ref": "issue-17-acceptance",
+  "work_item_type": "requirement",
+  "working_effort_summary": "Android emulator acceptance for CJMP issue-17: verified clean no-session launch into the login handoff shell and verified the continue CTA stays in a slice-1-only notice state instead of navigating into a real authenticated surface; the startup-failure path could not be runtime-triggered from the delivered build, so the round ended partially verified with an explicit acceptance gap."
+}
